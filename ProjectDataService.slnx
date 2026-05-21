@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ProjectDataService/ProjectDataService.csproj" />
+  <Project Path="ProjectDataServiceTests/ProjectDataServiceTests.csproj" />
+</Solution>
