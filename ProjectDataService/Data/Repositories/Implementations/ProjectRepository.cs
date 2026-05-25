@@ -10,12 +10,13 @@ namespace ProjectDataService.Data.Repositories.Implementations;
 public class ProjectRepository(GazellaDbContext context, ILogger<ProjectRepository> logger) : IProjectRepository
 {
     public async Task<(List<Project> Projects, int TotalCount)> GetProjects(
-        int pageIndex, int pageSize, string categoryId, string searchTerm)
+        int pageIndex, int pageSize, string categoryId, string searchTerm,
+        string location, string startDate, string orderBy)
     {
         try
         {
             var query = context.Projects
-                .Where(p => p.Status == ProjectStatus.Active);
+                .Where(p => p.Status == ProjectStatus.Active || p.Status == ProjectStatus.Completed);
 
             if (!string.IsNullOrWhiteSpace(categoryId))
                 query = query.Where(p => p.Category == categoryId);
@@ -23,9 +24,18 @@ public class ProjectRepository(GazellaDbContext context, ILogger<ProjectReposito
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 query = query.Where(p => p.Title.Contains(searchTerm));
 
+            if (!string.IsNullOrWhiteSpace(location))
+                query = query.Where(p => p.Location.Contains(location));
+
+            if (!string.IsNullOrWhiteSpace(startDate) && DateTime.TryParse(startDate, out var parsedDate))
+                query = query.Where(p => p.StartDate.Date == parsedDate.Date);
+
+            query = orderBy == "soonest"
+                ? query.OrderBy(p => p.StartDate)
+                : query.OrderByDescending(p => p.CreatedAt);
+
             var totalCount = await query.CountAsync();
             var projects = await query
-                .OrderByDescending(p => p.CreatedAt)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -72,7 +82,8 @@ public class ProjectRepository(GazellaDbContext context, ILogger<ProjectReposito
     }
 
     public async Task<(List<Enrollment> Volunteers, int TotalCount)> GetProjectVolunteers(
-        string projectId, string organizerId, int pageIndex, int pageSize)
+        string projectId, string organizerId, int pageIndex, int pageSize,
+        string searchTerm, string statusFilter)
     {
         try
         {
@@ -84,6 +95,15 @@ public class ProjectRepository(GazellaDbContext context, ILogger<ProjectReposito
 
             var query = context.Enrollments
                 .Where(e => e.ProjectId == projectId);
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+                query = query.Where(e => e.VolunteerFullName.Contains(searchTerm));
+
+            if (!string.IsNullOrWhiteSpace(statusFilter) && statusFilter != "all")
+            {
+                if (Enum.TryParse<EnrollmentStatus>(statusFilter, true, out var status))
+                    query = query.Where(e => e.Status == status);
+            }
 
             var totalCount = await query.CountAsync();
             var volunteers = await query

@@ -18,7 +18,10 @@ public class ProjectQueryService(
             request.PageIndex == 0 ? 1 : request.PageIndex,
             request.PageSize == 0 ? 10 : request.PageSize,
             request.CategoryId,
-            request.SearchTerm);
+            request.SearchTerm,
+            request.Location,
+            request.StartDate,
+            request.OrderBy);
 
         var pagination = PaginationUtil.Calculate(
             totalCount,
@@ -114,7 +117,8 @@ public class ProjectQueryService(
         var pageSize = request.PageSize == 0 ? 10 : request.PageSize;
 
         var (volunteers, totalCount) = await projectRepository.GetProjectVolunteers(
-            request.ProjectId, request.OrganizerId, pageIndex, pageSize);
+            request.ProjectId, request.OrganizerId, pageIndex, pageSize,
+            request.SearchTerm, request.StatusFilter);
 
         var pagination = PaginationUtil.Calculate(totalCount, pageIndex, pageSize);
 
