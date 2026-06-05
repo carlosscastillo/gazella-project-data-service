@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile
     container_name: project_data_service
     ports:
-      - "8200:8080"
+      - "11000:8080"
     networks:
       - gazella-net
     environment:
