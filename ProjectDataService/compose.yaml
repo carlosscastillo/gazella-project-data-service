@@ -25,6 +25,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: project_data_service
+    restart: unless-stopped
     ports:
       - "11000:8080"
     networks:
