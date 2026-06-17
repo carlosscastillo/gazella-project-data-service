@@ -114,7 +114,8 @@ public class RegistrationService(
             StartDate = e.Project?.StartDate.ToString("yyyy-MM-dd") ?? string.Empty,
             ProjectStatus = e.Project?.Status.ToString() ?? string.Empty,
             EnrollmentStatus = e.Status.ToString(),
-            EnrolledAt = e.EnrolledAt.ToString("o")
+            EnrolledAt = e.EnrolledAt.ToString("o"),
+            CoverUri = e.Project?.CoverUri ?? string.Empty
         }));
 
         return response;

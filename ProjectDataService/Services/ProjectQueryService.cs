@@ -101,7 +101,8 @@ public class ProjectQueryService(
             EndDate = p.EndDate.ToString("yyyy-MM-dd"),
             Status = p.Status.ToString(),
             EnrolledCount = p.EnrolledCount,
-            MaxVolunteers = p.MaxVolunteers
+            MaxVolunteers = p.MaxVolunteers,
+            CoverUri = p.CoverUri ?? string.Empty
         }));
 
         return response;
